@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Full-Screen Modern Calculator</title>
+    <style>
+        /* Global Styling */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #1e272e, #485460);
+            transition: 0.5s ease;
+        }
+
+        /* Full-Screen Calculator */
+        .calculator {
+            width: 90%;
+            max-width: 600px;
+            height: 85vh;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            text-align: center;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        /* Display Screen */
+        #display {
+            width: 100%;
+            height: 80px;
+            font-size: 2em;
+            text-align: right;
+            padding: 10px;
+            border: none;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            margin-bottom: 15px;
+            color: #fff;
+            transition: 0.3s ease;
+        }
+
+        /* Button Grid */
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        button {
+            padding: 20px;
+            font-size: 1.5em;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        button:hover {
+            background: #1e90ff;
+            transform: translateY(-2px);
+        }
+
+        .equal {
+            background: #ff4757;
+        }
+
+        .equal:hover {
+            background: #e84118;
+        }
+
+        /* History */
+        .history {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 10px;
+            margin-top: 15px;
+            border-radius: 10px;
+            max-height: 120px;
+            overflow-y: auto;
+            text-align: left;
+            font-size: 0.9em;
+            transition: 0.3s ease;
+        }
+
+        /* Toggle Button */
+        .mode-toggle {
+            padding: 10px;
+            background: #1e90ff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: background 0.3s ease;
+        }
+
+        .mode-toggle:hover {
+            background: #ff4757;
+        }
+
+        /* Light Mode */
+        .light-mode {
+            background: linear-gradient(135deg, #f1f2f6, #dfe4ea);
+        }
+
+        .light-mode .calculator {
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        .light-mode #display {
+            background: rgba(255, 255, 255, 0.6);
+            color: #333;
+        }
+
+        .light-mode .history {
+            background: rgba(255, 255, 255, 0.6);
+            color: #333;
+        }
+
+        .light-mode button {
+            background: rgba(0, 0, 0, 0.1);
+            color: #333;
+        }
+
+        .light-mode button:hover {
+            background: #1e90ff;
+            color: #fff;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .calculator {
+                height: 95vh;
+                width: 100%;
+                border-radius: 0;
+            }
+            button {
+                font-size: 1.3em;
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="mode-toggle" onclick="toggleMode()">Toggle Dark/Light Mode</button>
+    <div class="calculator">
+        <input type="text" id="display" readonly>
+        <div class="buttons">
+            <button onclick="clearDisplay()">C</button>
+            <button onclick="appendValue('/')">/</button>
+            <button onclick="appendValue('')"></button>
+            <button onclick="appendValue('-')">-</button>
+            <button onclick="appendValue('7')">7</button>
+            <button onclick="appendValue('8')">8</button>
+            <button onclick="appendValue('9')">9</button>
+            <button onclick="appendValue('+')">+</button>
+            <button onclick="appendValue('4')">4</button>
+            <button onclick="appendValue('5')">5</button>
+            <button onclick="appendValue('6')">6</button>
+            <button class="equal" onclick="calculate()">=</button>
+            <button onclick="appendValue('1')">1</button>
+            <button onclick="appendValue('2')">2</button>
+            <button onclick="appendValue('3')">3</button>
+            <button onclick="appendValue('0')">0</button>
+            <button onclick="appendValue('.')">.</button>
+            <button onclick="appendValue('%')">%</button>
+            <button onclick="appendValue('Math.sqrt(')">√</button>
+            <button onclick="appendValue('Math.log(')">log</button>
+            <button onclick="appendValue('Math.sin(')">sin</button>
+            <button onclick="appendValue('Math.cos(')">cos</button>
+            <button onclick="appendValue('Math.tan(')">tan</button>
+            <button onclick="appendValue('Math.exp(')">exp</button>
+        </div>
+    </div>
+    <div class="history" id="history"></div>
+
+    <script>
+        function appendValue(value) {
+            document.getElementById("display").value += value;
+        }
+        function clearDisplay() {
+            document.getElementById("display").value = "";
+        }
+        function calculate() {
+            try {
+                let result = eval(document.getElementById("display").value);
+                if (!isFinite(result)) throw "Error";
+                document.getElementById("display").value = result;
+                addHistory(result);
+            } catch {
+                document.getElementById("display").value = "Error";
+                setTimeout(() => document.getElementById("display").value = "", 1500);
+            }
+        }
+        function addHistory(result) {
+            let historyDiv = document.getElementById("history");
+            let entry = document.createElement("div");
+            entry.textContent = document.getElementById("display").value + " = " + result;
+            historyDiv.prepend(entry);
+        }
+        function toggleMode() {
+            document.body.classList.toggle("light-mode");
+        }
+    </script>
+</body>
+</html>
